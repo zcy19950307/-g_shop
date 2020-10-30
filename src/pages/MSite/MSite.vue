@@ -2,12 +2,14 @@
   <section class="msite">
     <!--首页头部-->
     <HeaderTop :title="address.name">
-      <span class="header_search" slot="left">
+      <router-link class="header_search" slot="left" to ="search">
         <i class="iconfont icon-sousuo"></i>
-      </span>
-      <span class="header_login" slot="right">
-        <span class="header_login_text">登录|注册</span>
-      </span>
+      </router-link>
+      <router-link class="header_login" slot="right" :to="userInfo._id ? '/userInfo' :'/login'">
+
+        <span class="header_login_text" v-if="!userInfo._id">登录|注册</span>
+        <span class="header_login_text" v-else><i class="iconfont icon-person"></i></span>
+      </router-link>
     </HeaderTop>
     <!--首页导航-->
     <nav class="msite_nav">
@@ -58,10 +60,10 @@ export default {
 
     this.$store.dispatch("getCategorys")
     this.$store.dispatch("getShops")
+    console.log(this)
   },
 
   watch:{
-
     categorys (value) {
        console.log(2132)
       //穿件一个Swiper实例对象 轮播
@@ -79,7 +81,7 @@ export default {
   },
   computed:{
     // 相当拿到State 这个  address','categorys  值 放到 this
-    ...mapState(['address','categorys']),
+    ...mapState(['address','categorys','userInfo']),
     //根据categoroys一维数组生成二位数组
     // 这里能走 说明  categoroys 后台的请求回来了 因为 categoroys里面有值 导致 computed 中都出发了
     categorysArr(){

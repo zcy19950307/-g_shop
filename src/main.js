@@ -8,6 +8,11 @@ import App from './App'
 import router from './router'
 // 引入vuex
 import store from './store'
+import {Button} from 'mint-ui'
+
+//注册全局全局组件标签
+Vue.component(Button.name,Button)
+
 
 new Vue({
 

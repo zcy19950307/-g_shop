@@ -14,11 +14,12 @@ export default {
   mounted () {
     //this.$store.dispatch('getAddress')
     this.getAddress()
+    this.getUserInfo()
   },
   methods:{
     //  ...mapActions(['getAddress'])
     // 相当于声明了一个方法  getAddress(){ return this.$store.dispatch('getAddress')} 上面 mounted 通过  this.getAddress()调用 这里 方法的名字必须 getAddress
-    ...mapActions(['getAddress'])
+    ...mapActions(['getAddress','getUserInfo'])
 
   },
   components: {
