@@ -11,7 +11,7 @@
     </HeaderTop>
     <!--首页导航-->
     <nav class="msite_nav">
-      <div class="swiper-container">
+      <div class="swiper-container" v-if="categorys.length">
         <div class="swiper-wrapper">
           <div class="swiper-slide" v-for="(categorys , index) in categorysArr" :key="index">
             <a href="javascript:" class="link_to_food" v-for="(category,index) in categorys" :key="index">
@@ -25,6 +25,7 @@
         <!-- Add Pagination -->
         <div class="swiper-pagination"></div>
       </div>
+      <img src="./images/msite_back.svg" alt="back" v-else>
     </nav>
     <!--首页附近商家-->
     <div class="msite_shop_list">
@@ -56,25 +57,35 @@ export default {
   mounted () {
 
     this.$store.dispatch("getCategorys")
+    this.$store.dispatch("getShops")
+  },
 
-    //穿件一个Swiper实例对象 轮播
-    new Swiper('.swiper-container',{
+  watch:{
 
-      loop:true, //可以循环轮播
-      pagination:{
-        el:".swiper-pagination"
-      }
-
-    })
+    categorys (value) {
+       console.log(2132)
+      //穿件一个Swiper实例对象 轮播
+      // 界面完成立即调用，次语句用户数据之后
+      this.$nextTick(() =>{
+        //console.log(132131654615)
+        new Swiper('.swiper-container',{
+          loop:true, //可以循环轮播
+          pagination:{
+            el:".swiper-pagination"
+          }
+        })
+      })
+    }
   },
   computed:{
+    // 相当拿到State 这个  address','categorys  值 放到 this
     ...mapState(['address','categorys']),
     //根据categoroys一维数组生成二位数组
     // 这里能走 说明  categoroys 后台的请求回来了 因为 categoroys里面有值 导致 computed 中都出发了
     categorysArr(){
-
+      console.log(1132)
       const {categorys} = this
-      console.log(categorys)
+
       //准备2维数组
       const arr = []
       // 准备一个小数组
@@ -94,9 +105,10 @@ export default {
         minArr.push(c)
 
       })
+
       return arr
     },
-    //
+
     // aba(){
     //   console.log("adfsd")
     // }

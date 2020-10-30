@@ -6,7 +6,8 @@ import {
 
   RECEIVE_ADDRESS,
   RECEIVE_SHOPS,
-  RECEIVE_CATEGORYS
+  RECEIVE_CATEGORYS,
+  RECEIVE_USER_INFO
 } from './mutation-types'
 
 import {reqAddress, reqFoodCategorys, reqShops} from '../api'
@@ -20,7 +21,6 @@ export default {
     const geohash = state.latitude + ',' + state.longitude
     const result = await reqAddress(geohash)
     // 提交一个mutation
-    console.log(result)
     if (result.code === 0) {
       const address = result.data
       commit(RECEIVE_ADDRESS, {address})
@@ -33,7 +33,6 @@ export default {
   async getCategorys ({commit}) {
     // 发送ajax请求
     const result = await reqFoodCategorys()
-    console.log(result)
     // 提交一个mutation
     if (result.code === 0) {
       const categorys = result.data
@@ -55,6 +54,11 @@ export default {
       commit(RECEIVE_SHOPS, {shops})
     }
 
+  },
+
+  //同步记录用户信息
+  recordUser({commit},userInfo){
+    commit(RECEIVE_USER_INFO,userInfo)
   }
 
 }
