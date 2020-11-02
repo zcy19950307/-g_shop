@@ -1,5 +1,6 @@
 <template>
   <div>
+
     <div class="goods">
       <div class="menu-wrapper" ref="menuWrapper">
         <ul>
