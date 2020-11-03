@@ -1,11 +1,10 @@
 <template>
   <div>
-
     <div class="goods">
       <div class="menu-wrapper" ref="menuWrapper">
         <ul>
           <!-- current -->
-          <li class="menu-item" v-for="(good,index) in goods" :key="index">
+          <li class="menu-item" v-for="(good,index) in goods" :key="index" :class="{current: index === currentIndex}" @click="clickMenuItem(index)">
             <span class="text bottom-border-1px">
             <img class="icon"  :src="good.icon" v-if="good.icon">
               {{good.name}}
@@ -15,11 +14,12 @@
         </ul>
       </div>
       <div class="foods-wrapper" ref="foodsWrapper">
-        <ul>
-          <li class="food-list-hook"  v-for="(good,index) in goods" :key="index" :class="{current: index === currentIndex}">
+        <ul ref="foodsUl">
+          <li class="food-list-hook"  v-for="(good,index) in goods" :key="index" >
             <h1 class="title">{{good.name}}</h1>
             <ul>
-              <li class="food-item bottom-border-1px" v-for="(food,index) in good.foods" :key="index">
+              <li class="food-item bottom-border-1px" v-for="(food,index) in good.foods" :key="index"
+               @click="showFood(food)">
                 <div class="icon">
                   <img width="57" height="57" :src="food.icon">
                 </div>
@@ -31,54 +31,121 @@
                     <span class="now">￥{{food.price}}</span>
                     <span class="now" v-if="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
-                  <div class="cartcontrol-wrapper"> CartControl</div>
+                  <div class="cartcontrol-wrapper"> <CartControl :food="food"/></div>
                 </div>
               </li>
             </ul>
           </li>
         </ul>
       </div>
+      <ShopCart />
     </div>
+    <Food :food="food"  ref="food"/>
   </div>
 </template>
 
 <script>
 import {mapState} from 'vuex'
 import BScroll from 'better-scroll'
-
-
-
+import CartControl from '../../../components/CartControl/CartControl'
+import Food from '../../../components/Food/Food'
+import ShopCart from '../../../components/ShopCart'
 
 export default {
 
   data(){
     return{
       scrollY : 0 , // 右侧滑动Y轴坐标（滑动过程实时变化）
-      tops:[] // 所有右侧分类li的top组成数组（列表第一次显示以后再也不变化）
-
+      tops:[], // 所有右侧分类li的top组成数组（列表第一次显示以后再也不变化）
+      food:{}
     }
   },
   mounted () {
     this.$store.dispatch("getShopGoods")
     this.$nextTick(()=>{
-
-      // 列表显示之后创建
-      new BScroll('.menu-wrapper')
-
-      // 列表显示之后创建
-      new BScroll('.foods-wrapper')
+        this._initScroll()
+        this._initTops()
     })
   },
   computed:{
     ...mapState(['goods']),
 
     //计算得到当前分类下标
-    currentIndex(){
+    currentIndex() {
+      // 计算得到数据
+      const  {scrollY,tops} = this
+      // 根据条件计算产生一个结果
+     return  tops.findIndex((top, index) => scrollY >= top && scrollY < tops[index + 1])
+    }
+  },
+  components:{
+    CartControl,
+    Food,
+    ShopCart
+  },
+  methods:{
+    // 初始化滚动
+    _initScroll(){
+      // //
+      // let arr = [0,10,24,54,46]
+      //
+      //   console.log(arr.indexOf(3))
+      //
+      // arr.findIndex((top) =>{
+      //   console.log(top)
+      // })
+      // 列表显示之后创建
+      new BScroll('.menu-wrapper',{
+        click:true
+      })
+
+      // 列表显示之后创建
+       this.foodsScroll = new BScroll('.foods-wrapper',{
+        probeType:2,
+        click:true
+      })
+
+      // 给右侧列表绑定坚挺
+      this.foodsScroll.on('scroll',({x,y}) => this.scrollY =  Math.abs(y))
+
+      // 给右侧结束李彪
+      this.foodsScroll.on('scrollEnd',({x,y}) =>this.scrollY =  Math.abs(y))
+
+
+    },
+    // 初始化tops
+    _initTops(){
+      // 1.初始化tops
+      const tops = []
+      let top = 0
+      tops.push(top)
+      //2.找到所有分类的li
+      const list  =   this.$refs.foodsUl.getElementsByClassName("food-list-hook")
+      Array.from(list).forEach(item =>{
+        top += item.clientHeight
+        tops.push(top)
+      })
+      //3.更新数据
+      this.tops = tops
+    },
+    // 点击左侧菜单，完成右侧效果
+    clickMenuItem(index){
+      // 使用右侧列表滑动到对应位置
+      const scrollY  = this.tops[index]
+      console.log(scrollY ,index)
+      this.scrollY = scrollY
+      this.foodsScroll.scrollTo(0,-scrollY,3000)
+    },
+
+    // 显示图片详情
+    showFood(food){
+
+      // 是指food
+    this.food  = food
+    this.$refs.food.toggleShow()
 
     }
-
   }
-
 }
 </script>
 
