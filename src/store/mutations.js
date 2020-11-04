@@ -11,7 +11,10 @@ import {
   RESET_USER_INFO,
   RECEIVE_INFO,
   RECEIVE_GOODS,
-  RECEIVE_RATINGS, INCREMENT_FOOD_COUNT, DECREMENT_FOOD_COUNT
+  RECEIVE_RATINGS,
+  INCREMENT_FOOD_COUNT,
+  DECREMENT_FOOD_COUNT,
+  CLEAR_CART
 } from './mutation-types'
 
 export default {
@@ -50,7 +53,7 @@ export default {
 
     if(!food.count){
       Vue.set(food,'count',1)
-      //将Food添加到cartFoods
+      //将Food添加到cartFoods 就是购物车的里面的列表
       state.cartFoods.push(food)
     }else{
       food.count++
@@ -62,9 +65,15 @@ export default {
     if (food.count) {
       food.count--
       if(food.count === 0){
-          //讲Food中cartFoods 移除
+          //讲Food中cartFoods 移除 当某一项数据为0是 就删除购物车里面的对应的数据
           state.cartFoods.splice(state.cartFoods.indexOf(food),1)
       }
     }
+  },
+
+  [CLEAR_CART] (state) {
+    //清除food中的count
+    state.cartFoods.forEach(food =>food.count = 0)
+    state.cartFoods = []
   }
 }

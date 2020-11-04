@@ -1,9 +1,11 @@
 <template>
-
   <div>
+    <!--
+      购物车组件
+    -->
     <div class="shopcart">
       <div class="content">
-        <div class="content-left">
+        <div class="content-left" @click="toggleShow">
           <div class="logo-wrapper">
             <div class="logo" :class="{highlight:totalCount}">
               <i class="iconfont icon-shopping_cart" :class="{highlight:totalCount}"></i>
@@ -14,29 +16,37 @@
           <div class="desc">另需配送费￥{{info.deliveryPrice}}元</div>
         </div>
         <div class="content-right">
-          <div class="pay" :class="{payClass}">{{payText}} </div>
+          <div class="pay" :class="payClass">{{payText}} </div>
         </div>
       </div>
-      <div class="shopcart-list" style="display: none;">
-        <div class="list-header"> 166
-          <h1 class="title">购物车</h1> <span class="empty">清空</span></div>
-        <div class="list-content">
-          <ul>
-            <li class="food"><span class="name">红枣山药糙米粥</span>
-              <div class="price"><span>￥10</span></div>
-              <div class="cartcontrol-wrapper">
-                <div class="cartcontrol">
-                  <div class="iconfont icon-remove_circle_outline"></div>
-                  <div class="cart-count">1</div>
-                  <div class="iconfont icon-add_circle"></div>
+      <transition name = "move">
+        <div class="shopcart-list"  v-show="listShow">
+          <div class="list-header">
+            <h1 class="title">购物车</h1>
+            <span class="empty" @click="clearCart">清空</span>
+          </div>
+          <div class="list-content">
+            <ul>
+              <!--
+                购物车底层列表
+              -->
+              <li class="food" v-for="(food, index) in cartFoods" :key="index">
+                <span class="name">{{food.name}}</span>
+                <div class="price"><span>￥{{food.price}}</span></div>
+                <div class="cartcontrol-wrapper">
+                  <!--
+                    CartControl   + 号 或 -号
+                  -->
+                  <CartControl :food="food"/>
                 </div>
-              </div>
-            </li>
-          </ul>
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </transition>
+
     </div>
-    <div class="list-mask" style="display: none;"></div>
+    <div class="list-mask" v-show="listShow" @click="toggleShow"></div>
   </div>
 
 </template>
@@ -48,34 +58,72 @@ import BScroll from 'better-scroll'
 import {mapState, mapGetters} from 'vuex'
 
 export default {
+  data(){
+    return{
+      isShow: false
+    }
+  },
   components: {
     CartControl
   },
   computed: {
     ...mapState(['cartFoods', 'info']),
     ...mapGetters(['totalCount', 'totalPrice']),
+    listShow(){
+      //如果总数量为0 直接不显示
+      if(this.totalCount === 0){
+        this.isShow = false
+        return  false
+      }
+      // 这个实现购物车列表数据的滚动条
+      if(this.isShow){
+        this.$nextTick(()=>{
+          //  要实现 BScroll  保证单利模式
+          if(!this.scroll){
+            this.scroll=  new  BScroll('.list-content',{
+              click:true
+            })
+          }else {
+            this.scroll.refresh() // 强制刷新对象 ： 重新计算里面 宽高
+          }
+        })
+      }
+
+      return  this.isShow
+    },
 
     payClass(){
+
       const {totalPrice} = this
       const {minPrice} = this.info
-      return totalPrice >= minPrice ? 'enough' :'not-enough'
+      return totalPrice >= minPrice ? 'enough' : 'not-enough'
     },
 
     payText(){
       const {totalPrice} = this
       const {minPrice} = this.info
       if(totalPrice === 0){
-
         return `￥${minPrice}元起送`
       }else if(totalPrice < minPrice){
         return `差￥${minPrice-totalPrice}元起送`
       }else{
         return `结算`
       }
-
     }
   },
-
+  methods: {
+    toggleShow () {
+      // 只有当总数量大于0时切换
+      if (this.totalCount > 0) {
+        this.isShow = !this.isShow
+      }
+    },
+    clearCart(){
+      MessageBox.confirm('确定清空购物车吗?').then(action =>{
+          this.$store.dispatch('clearCart')
+      })
+    }
+  }
 }
 
 </script>

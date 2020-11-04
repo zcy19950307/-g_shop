@@ -38,8 +38,14 @@
           </li>
         </ul>
       </div>
+      <!--
+        ShopCart 购物车
+      -->
       <ShopCart />
     </div>
+    <!--
+       商品详情
+    -->
     <Food :food="food"  ref="food"/>
   </div>
 </template>

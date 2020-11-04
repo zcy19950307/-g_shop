@@ -19,6 +19,9 @@
           <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
         </div>
         <div class="cartcontrol-wrapper">
+            <!--
+               CartControl   + 号 或 -号
+             -->
           <CartControl :food="food"/>
         </div>
       </div>
@@ -44,7 +47,6 @@ export default {
 
   methods: {
     toggleShow () {
-      console.log(this.isShow)
       this.isShow = !this.isShow
     }
   },

@@ -1,4 +1,7 @@
 <template>
+  <!--
+    +   -
+  -->
   <div class="cartcontrol">
     <transition name="move">
       <div class="iconfont icon-remove_circle_outline" v-if="food.count" @click.stop="updateFoodCount(false)"></div>
@@ -15,7 +18,7 @@ export default {
   },
   methods:{
     updateFoodCount(isAdd){
-        this.$store.dispatch('updateFoodCount', {isAdd,food:this.food})
+      this.$store.dispatch('updateFoodCount', {isAdd,food:this.food})
     }
   }
 
