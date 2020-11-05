@@ -26,7 +26,7 @@
       <section class="section">
         <h3 class="section-title">商家实景</h3>
         <div class="pic-wrapper">
-          <ul class="pic-list">
+          <ul class="pic-list" ref="picUl">
             <li class="pic-item" v-for="(pic,index) in info.pics" :key="index">
               <img width="120" height="90" :src="pic"/>
             </li>
@@ -72,12 +72,33 @@ export default {
       ...mapState(['info'])
     },
     mounted () {
-       new BScroll('.shop-info')
-       new BScroll('.pic-wrapper',{
-         scrollX:true
-       })
-    }
 
+      //如果数据没有，直接结束
+      if(!this.info.pics){
+        return
+      }
+      this._initScroll()
+    },
+    watch:{
+      info(){ //刷新
+        this.$nextTick(() =>{
+          this._initScroll()
+        })
+      },
+    },
+  methods:{
+    _initScroll(){
+      new BScroll('.shop-info')
+      const ul = this.$refs.picUl
+      const liWidth =  120
+      const space =  6
+      const  count =  this.info.pics.length
+      ul.style.width = (liWidth +space) *count - space +'px'
+      new BScroll('.pic-wrapper',{
+        scrollX:true
+      })
+    }
+  }
 }
 </script>
 
